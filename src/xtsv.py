@@ -231,7 +231,7 @@ class XtsvFile:
                                        if not X.isnumeric() and \
                                           X not in ('.', 'e', 'E', '+', '-')), 
                                   None)
-        if nonNumericPosition is None:
+        if nonNumericPosition is None or nonNumericPosition == 0:
             return XtsvCell(XtsvFile.detectNumeral(value.strip()))
         return XtsvCell(XtsvFile.detectNumeral(value[:nonNumericPosition]), 
                         value[nonNumericPosition:].strip())
