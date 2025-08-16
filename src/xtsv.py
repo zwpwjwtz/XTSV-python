@@ -207,7 +207,8 @@ class XtsvFile:
             return value
     
     @staticmethod
-    def parseCell(value: str, detectNumeral: bool = True) -> XtsvCell:
+    def parseCell(value: str, detectNumeral: bool = True, 
+                  noneValues: list[str] = ['None', 'none']) -> XtsvCell:
         """
         Parse a string as a cell in a table of XTSV file.
 
@@ -218,12 +219,17 @@ class XtsvFile:
         detectNumerals : bool, optional
             Whether to convert cell values to numerals whenever possible.
             The default is True.
+        noneValues : list[str], optional
+            Specific strings to be parsed as None.
+            The default is ['None', 'none'].
 
         Returns
         -------
         XtsvCell
             A XtsvCell object holding the parse value.
         """
+        if value in noneValues:
+            return XtsvCell(None)
         if not detectNumeral:
             return XtsvCell(value.strip())
         
