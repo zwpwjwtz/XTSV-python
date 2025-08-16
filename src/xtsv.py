@@ -56,7 +56,29 @@ class XtsvTable:
         self.name = name
         self.columnNames = columnNames
         self.rowNames: list[str] = []
-        self.values: list[list] = []
+        self.values: list[list[XtsvCell]] = []
+    
+    def columnCount(self) -> int:
+        """
+        Get the number of columns in the table.
+
+        Returns
+        -------
+        int
+            The number of columns.
+        """
+        return max(len(X) for X in self.values)
+    
+    def rowCount(self) -> int:
+        """
+        Get the number of rows in the table.
+
+        Returns
+        -------
+        int
+            The number of rows.
+        """
+        return len(self.values)
     
     def appendRow(self, values: list[XtsvCell], rowName: str = None):
         """
