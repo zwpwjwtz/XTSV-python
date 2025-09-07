@@ -208,7 +208,8 @@ class XtsvFile:
     
     @staticmethod
     def parseCell(value: str, detectNumeral: bool = True, 
-                  noneValues: list[str] = ['None', 'none']) -> XtsvCell:
+                  noneValues: list[str] = ['None', 'none'], 
+                  parseUnit = True) -> XtsvCell:
         """
         Parse a string as a cell in a table of XTSV file.
 
@@ -222,6 +223,9 @@ class XtsvFile:
         noneValues : list[str], optional
             Specific strings to be parsed as None.
             The default is ['None', 'none'].
+        parseUnit : bool, optional
+            Whether to parse the non-numeric part after a numeral as its unit.
+            The default is True.
 
         Returns
         -------
@@ -232,6 +236,8 @@ class XtsvFile:
             return XtsvCell(None)
         if not detectNumeral:
             return XtsvCell(value.strip())
+        if not parseUnit:
+            return XtsvCell(XtsvFile.detectNumeral(value.strip()))
         
         nonNumericPosition = next(iter(i for i, X in enumerate(value) 
                                        if not X.isnumeric() and \
@@ -242,8 +248,8 @@ class XtsvFile:
         return XtsvCell(XtsvFile.detectNumeral(value[:nonNumericPosition]), 
                         value[nonNumericPosition:].strip())
     
-    def parse(self, detectNumerals: bool = True, rowNames: bool = True) \
-             -> list[XtsvSection]:
+    def parse(self, detectNumerals: bool = True, rowNames: bool = True, 
+              unit: bool = True) -> list[XtsvSection]:
         """
         Parse the specified XTSV file.
 
@@ -255,6 +261,10 @@ class XtsvFile:
         rowNames : bool, optional
             Whether to treat the first cell in each row in a table as 
             the row name.
+            The default is True.
+        unit : bool, optional
+            Whether to parse the non-numeric part after a numeral in a table 
+            cell as a unit.
             The default is True.
         
         Returns
@@ -306,12 +316,14 @@ class XtsvFile:
                                 # Table content
                                 if rowNames:
                                     table.appendRow(
-                                        [self.parseCell(X, detectNumerals) 
+                                        [self.parseCell(X, detectNumerals, 
+                                                        parseUnit = unit) 
                                          for X in cells[1:]], 
                                         cells[0])
                                 else:
                                     table.appendRow(
-                                        [self.parseCell(X, detectNumerals) 
+                                        [self.parseCell(X, detectNumerals, 
+                                                        parseUnit = unit) 
                                          for X in cells])
                     else:
                         if len(cells) > 2:
