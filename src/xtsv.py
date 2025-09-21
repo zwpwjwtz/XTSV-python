@@ -287,54 +287,47 @@ class XtsvFile:
                 cells = [X.strip() for X in line.split('\t')]
                 cells = [X for X in cells if len(X) > 0]
                 if len(cells) == 0:
+                    if table is not None:
+                        # The end of a table
+                        inSection = False
+                        table = None
                     continue
-                if len(cells) == 1:
-                    # The beginning of a section containing tables
-                    inSection = True
-                    sectionName = cells[0]
-                    section = sections.get(sectionName, 
-                                           XtsvSection(sectionName))
-                    sections[sectionName] = section
-                    table = None
-                else:
-                    if inSection:
-                        if table is None:
-                            # The beginning of a table
-                            table = XtsvTable(cells[0], cells[1:])
-                            section.appendTable(table)
-                        else:
-                            if len(cells) == 2 and \
-                               (len(table.values) == 0 or \
-                                len(table.values[-1]) != 2):
-                                # A new section with no table but a value
-                                inSection = False
-                                table = None
-                                sectionName = cells[0]
-                                sections[sectionName] = \
-                                    XtsvSection(sectionName, cells[1])
-                            else:
-                                # Table content
-                                if rowNames:
-                                    table.appendRow(
-                                        [self.parseCell(X, detectNumerals, 
-                                                        parseUnit = unit) 
-                                         for X in cells[1:]], 
-                                        cells[0])
-                                else:
-                                    table.appendRow(
-                                        [self.parseCell(X, detectNumerals, 
-                                                        parseUnit = unit) 
-                                         for X in cells])
+                
+                if inSection:
+                    if table is None:
+                        # The beginning of a table
+                        table = XtsvTable(cells[0], cells[1:])
+                        section.appendTable(table)
                     else:
-                        if len(cells) > 2:
-                            # Invalid number of cells outside a table
-                            raise ValueError('{} cells found in the section '
-                                             '{} but without a table'.
-                                             format(len(cells), section.name))
+                        # Table content
+                        if rowNames:
+                            table.appendRow([self.parseCell(X, detectNumerals, 
+                                                            parseUnit = unit) 
+                                             for X in cells[1:]], 
+                                            cells[0])
+                        else:
+                            table.appendRow([self.parseCell(X, detectNumerals, 
+                                                            parseUnit = unit) 
+                                             for X in cells])
+                else:
+                    if len(cells) == 1:
+                        # The beginning of a section containing tables
+                        inSection = True
+                        sectionName = cells[0]
+                        section = sections.get(sectionName, 
+                                               XtsvSection(sectionName))
+                        sections[sectionName] = section
+                        table = None
+                    elif len(cells) == 2:
                         # A section with no table but a value
                         sectionName = cells[0]
                         sections[sectionName] = XtsvSection(sectionName, 
                                                             cells[1])
+                    else:
+                        # Invalid number of cells outside a table
+                        raise ValueError('{} cells found in the section '
+                                         '{} but without a table'.
+                                         format(len(cells), section.name))
         
         # Remove empty sections
         sections = {name: section for name, section in sections.items() 
