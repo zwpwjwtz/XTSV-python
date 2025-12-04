@@ -123,7 +123,7 @@ class XtsvSection:
     """
     The container class holding a section of XTSV file.
     """
-    def __init__(self, name: str, value: object = None):
+    def __init__(self, name: str, value: XtsvCell = None):
         """
         Initialize an XtsvSection object.
 
@@ -131,9 +131,9 @@ class XtsvSection:
         ----------
         name : str
             The name of the section.
-        value : object, optional
-            An object of type "str", "int" or "float" representing the value 
-            attached to the section.
+        value : XtsvCell, optional
+            A XtsvCell object holding representing the value attached to 
+            the section.
             The default is None.
 
         Returns
@@ -321,8 +321,11 @@ class XtsvFile:
                     elif len(cells) == 2:
                         # A section with no table but a value
                         sectionName = cells[0]
+                        sectionValue = self.parseCell(cells[1], 
+                                                      detectNumerals, 
+                                                      parseUnit = unit)
                         sections[sectionName] = XtsvSection(sectionName, 
-                                                            cells[1])
+                                                            sectionValue)
                     else:
                         # Invalid number of cells outside a table
                         raise ValueError('{} cells found in the section '
