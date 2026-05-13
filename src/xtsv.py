@@ -240,8 +240,11 @@ class XtsvFile:
             return XtsvCell(XtsvFile.detectNumeral(value.strip()))
         
         nonNumericPosition = next(iter(i for i, X in enumerate(value) 
-                                       if not X.isnumeric() and \
-                                          X not in ('.', 'e', 'E', '+', '-')), 
+                                       if not (X.isnumeric() or 
+                                               i == 0 and 
+                                               X in ('.', '+', '-') or 
+                                               i > 0 and 
+                                               X in ('.','e','E','+','-'))), 
                                   None)
         if nonNumericPosition is None or nonNumericPosition == 0:
             return XtsvCell(XtsvFile.detectNumeral(value.strip()))
