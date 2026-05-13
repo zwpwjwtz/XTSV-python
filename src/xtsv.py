@@ -6,7 +6,7 @@ class XtsvCell:
     """
     The container class holding a cell in a table of XTSV file.
     """
-    def __init__(self, value: object, unit: str = None):
+    def __init__(self, value: object, unit: str = None, raw: str = ''):
         """
         Initialize an XtsvCell object.
 
@@ -17,6 +17,9 @@ class XtsvCell:
         unit : str, optional
             The unit of the value when **value** is of type "int" or "float".
             The default is None, i.e. no unit.
+        raw : str, optional
+            The raw content of the cell.
+            The default is an empty string, i.e. no content.
 
         Returns
         -------
@@ -24,6 +27,7 @@ class XtsvCell:
         """
         self.value = value
         self.unit = unit
+        self.raw = raw
     
     def __repr__(self) -> str:
         """
@@ -235,9 +239,9 @@ class XtsvFile:
         if value in noneValues:
             return XtsvCell(None)
         if not detectNumeral:
-            return XtsvCell(value.strip())
+            return XtsvCell(value.strip(), raw = value)
         if not parseUnit:
-            return XtsvCell(XtsvFile.detectNumeral(value.strip()))
+            return XtsvCell(XtsvFile.detectNumeral(value.strip()), raw = value)
         
         nonNumericPosition = next(iter(i for i, X in enumerate(value) 
                                        if not (X.isnumeric() or 
@@ -247,9 +251,9 @@ class XtsvFile:
                                                X in ('.','e','E','+','-'))), 
                                   None)
         if nonNumericPosition is None or nonNumericPosition == 0:
-            return XtsvCell(XtsvFile.detectNumeral(value.strip()))
+            return XtsvCell(XtsvFile.detectNumeral(value.strip()), raw = value)
         return XtsvCell(XtsvFile.detectNumeral(value[:nonNumericPosition]), 
-                        value[nonNumericPosition:].strip())
+                        unit = value[nonNumericPosition:].strip(), raw = value)
     
     def parse(self, detectNumerals: bool = True, rowNames: bool = True, 
               unit: bool = True) -> list[XtsvSection]:
