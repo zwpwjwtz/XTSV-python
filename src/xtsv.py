@@ -244,7 +244,7 @@ class XtsvFile:
             return XtsvCell(XtsvFile.detectNumeral(value.strip()), raw = value)
         
         nonNumericPosition = next(iter(i for i, X in enumerate(value) 
-                                       if not (X.isnumeric() or 
+                                       if not (X.isdecimal() or 
                                                i == 0 and 
                                                X in ('.', '+', '-') or 
                                                i > 0 and 
