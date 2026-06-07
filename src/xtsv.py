@@ -291,7 +291,7 @@ class XtsvFile:
                     break
                 
                 # Get values in non-empty cells
-                cells = [X.strip() for X in line.split('\t')]
+                cells = [X.strip() for X in line.split(self.delimiter)]
                 cells = [X for X in cells if len(X) > 0]
                 if len(cells) == 0:
                     if table is not None:
