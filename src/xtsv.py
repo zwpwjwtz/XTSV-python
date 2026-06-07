@@ -239,21 +239,21 @@ class XtsvFile:
         if value in noneValues:
             return XtsvCell(None)
         if not detectNumeral:
-            return XtsvCell(value.strip(), raw = value)
+            return XtsvCell(value, raw = value)
         if not parseUnit:
-            return XtsvCell(XtsvFile.detectNumeral(value.strip()), raw = value)
+            return XtsvCell(XtsvFile.detectNumeral(value), raw = value)
         
         nonNumericPosition = next(iter(i for i, X in enumerate(value) 
                                        if not (X.isdecimal() or 
-                                               i == 0 and 
-                                               X in ('.', '+', '-') or 
-                                               i > 0 and 
-                                               X in ('.','e','E','+','-'))), 
+                                               i + 1 < len(value) and 
+                                               value[i + 1].isdecimal() and 
+                                               (X in ('.', '+', '-') or 
+                                                i > 0 and X in ('e','E')))), 
                                   None)
         if nonNumericPosition is None or nonNumericPosition == 0:
-            return XtsvCell(XtsvFile.detectNumeral(value.strip()), raw = value)
+            return XtsvCell(XtsvFile.detectNumeral(value), raw = value)
         return XtsvCell(XtsvFile.detectNumeral(value[:nonNumericPosition]), 
-                        unit = value[nonNumericPosition:].strip(), raw = value)
+                        unit = value[nonNumericPosition:], raw = value)
     
     def parse(self, detectNumerals: bool = True, rowNames: bool = True, 
               unit: bool = True) -> list[XtsvSection]:
