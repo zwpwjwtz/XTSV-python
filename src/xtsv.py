@@ -290,9 +290,11 @@ class XtsvFile:
                 if len(line) == 0:
                     break
                 
-                # Get values in non-empty cells
+                # Get the value in each cell
+                # Igore trailing empty cells at each row
                 cells = [X.strip() for X in line.split(self.delimiter)]
-                cells = [X for X in cells if len(X) > 0]
+                cells = cells[:next(iter(i for i in range(len(cells)-1, -1, -1)
+                                         if len(cells[i]) > 0), -1) + 1]
                 if len(cells) == 0:
                     if table is not None:
                         # The end of a table
